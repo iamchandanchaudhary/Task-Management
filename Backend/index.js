@@ -5,6 +5,7 @@ import connectCloudinary from "./config/cloudinary.js";
 import connectDB from "./config/connectDB.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 // App config
@@ -19,6 +20,7 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
 
 app.get("/", (req, res) => {
     res.send("Server Started.");
