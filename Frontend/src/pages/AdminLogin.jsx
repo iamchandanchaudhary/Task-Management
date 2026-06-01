@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const AdminLogin = () => {
@@ -47,7 +47,10 @@ const AdminLogin = () => {
       }
 
       const adminPayload = data.user || { email: trimmedEmail, role: "admin" };
-      login({ ...adminPayload, role: adminPayload.role || "admin" });
+      login({
+        user: { ...adminPayload, role: adminPayload.role || "admin" },
+        token: data.token || null
+      });
 
       const nextPath = location.state?.from?.pathname || "/admin";
       navigate(nextPath, { replace: true });
@@ -60,7 +63,10 @@ const AdminLogin = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-blue-50 text-slate-900">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#dbeafe,_transparent_58%)]" />
+      <div
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(circle at top, #dbeafe, transparent 58%)" }}
+      />
       <div className="absolute -top-16 right-0 h-64 w-64 rounded-full bg-blue-200/70 blur-3xl" />
       <div className="absolute bottom-0 left-0 h-72 w-72 -translate-x-1/3 translate-y-1/4 rounded-full bg-sky-200/70 blur-3xl" />
 

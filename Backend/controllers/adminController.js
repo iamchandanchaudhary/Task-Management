@@ -1,4 +1,8 @@
+import jwt from "jsonwebtoken";
+
 const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const getJwtSecret = () => process.env.JWT_SECRET;
 
 export const loginAdmin = async (req, res) => {
   try {
@@ -32,6 +36,14 @@ export const loginAdmin = async (req, res) => {
 
     return res.json({
       message: "Admin login successful.",
+      token: jwt.sign(
+        {
+          email: adminEmail,
+          role: "admin"
+        },
+        getJwtSecret(),
+        { expiresIn: "7d" }
+      ),
       user: {
         email: adminEmail,
         role: "admin"

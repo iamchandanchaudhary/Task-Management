@@ -1,7 +1,21 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const getJwtSecret = () => process.env.JWT_SECRET;
+
+const signUserToken = (user) =>
+  jwt.sign(
+    {
+      id: user._id.toString(),
+      email: user.email,
+      role: "user"
+    },
+    getJwtSecret(),
+    { expiresIn: "7d" }
+  );
 
 const buildUserResponse = (user) => {
   const plainUser = user.toObject();
@@ -38,6 +52,7 @@ export const registerUser = async (req, res) => {
 
     return res.status(201).json({
       message: "Account created successfully.",
+      token: signUserToken(user),
       user: buildUserResponse(user)
     });
   } catch (error) {
@@ -76,6 +91,7 @@ export const loginUser = async (req, res) => {
 
     return res.json({
       message: "Login successful.",
+      token: signUserToken(user),
       user: buildUserResponse(user)
     });
   } catch (error) {
