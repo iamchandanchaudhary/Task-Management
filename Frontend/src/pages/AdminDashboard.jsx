@@ -208,14 +208,14 @@ const AdminDashboard = () => {
                                             Registered: {formatDate(item.createdAt)}
                                         </p>
                                     </div>
-                                    <div className="flex flex-col gap-2 text-right text-xs text-slate-500">
-                                        <span className="rounded-full bg-slate-100 px-3 py-1">
+                                    <div className="flex flex-col items-end gap-2 text-right text-xs text-slate-500">
+                                        <span className="w-max rounded-full bg-slate-100 px-3 py-1">
                                             Tasks: {item.taskStats?.total || 0}
                                         </span>
-                                        <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700">
+                                        <span className="w-max rounded-full bg-amber-50 px-3 py-1 text-amber-700">
                                             Pending: {item.taskStats?.pending || 0}
                                         </span>
-                                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+                                        <span className="w-max rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
                                             Completed: {item.taskStats?.completed || 0}
                                         </span>
                                     </div>
