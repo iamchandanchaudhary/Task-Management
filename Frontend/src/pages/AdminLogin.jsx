@@ -71,7 +71,7 @@ const AdminLogin = () => {
       <div className="absolute bottom-0 left-0 h-72 w-72 -translate-x-1/3 translate-y-1/4 rounded-full bg-sky-200/70 blur-3xl" />
 
       <main className="relative z-10 mx-auto flex min-h-screen max-w-xl items-center px-6 py-14">
-        <div className="grid w-full overflow-hidden rounded-xl bg-white/95 shadow-lg backdrop-blur">
+        <div className="grid w-full overflow-hidden rounded-lg bg-white/95 shadow-lg backdrop-blur">
           <section className="px-8 py-10 md:px-10">
             <div className="space-y-6">
               <div>
@@ -92,7 +92,7 @@ const AdminLogin = () => {
                     placeholder="Enter email"
                     autoComplete="email"
                     required
-                    className="mt-2 w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
+                    className="mt-2 w-full rounded-lg border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-slate-800 focus:ring-2 focus:ring-slate-500"
                   />
                 </label>
 
@@ -107,7 +107,7 @@ const AdminLogin = () => {
                       placeholder="Enter password"
                       autoComplete="current-password"
                       required
-                      className="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 pr-12 text-sm text-slate-800 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
+                      className="w-full rounded-lg border border-slate-200 bg-white/80 px-4 py-3 pr-12 text-sm text-slate-800 shadow-sm outline-none transition focus:border-slate-800 focus:ring-2 focus:ring-slate-500"
                     />
                     <button
                       type="button"
@@ -139,7 +139,7 @@ const AdminLogin = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex items-center justify-center gap-2 mt-3 w-full rounded-xl bg-linear-to-br from-[#0141cb] to-[#00a9fd] py-3 text-sm md:text-base cursor-pointer font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="flex items-center justify-center gap-2 mt-3 w-full rounded-lg bg-slate-900 py-3 text-sm md:text-base cursor-pointer font-semibold text-white shadow-lg transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 fill-white" viewBox="0 -960 960 960"><path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" /></svg>
                   {isSubmitting ? "Logging in..." : "Login"}
