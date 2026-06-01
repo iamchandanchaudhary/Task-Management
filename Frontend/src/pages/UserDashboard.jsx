@@ -23,11 +23,18 @@ const UserDashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [formError, setFormError] = useState("");
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [pageError, setPageError] = useState("");
+    const [formError, setFormError] = useState("");
+    const [detailTask, setDetailTask] = useState(null);
+    const [editingTaskId, setEditingTaskId] = useState(null);
     const [form, setForm] = useState(emptyForm);
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [timeFilter, setTimeFilter] = useState("latest");
 
     const baseUrl = backendUrl.endsWith("/") ? backendUrl.slice(0, -1) : backendUrl;
+
+    const isEditing = Boolean(editingTaskId);
 
     const stats = useMemo(() => {
         const total = tasks.length;
@@ -36,6 +43,77 @@ const UserDashboard = () => {
 
         return { total, pending, completed };
     }, [tasks]);
+
+    const getTaskScheduleValue = (task) => {
+        const scheduleValue = new Date(`${task.taskDate}T${task.taskTime}`).getTime();
+
+        return Number.isNaN(scheduleValue) ? 0 : scheduleValue;
+    };
+
+    const visibleTasks = useMemo(() => {
+        const filteredTasks = tasks.filter((task) => {
+            if (statusFilter === "all") {
+                return true;
+            }
+
+            return task.status === statusFilter;
+        });
+
+        return [...filteredTasks].sort((leftTask, rightTask) => {
+            const leftSchedule = getTaskScheduleValue(leftTask);
+            const rightSchedule = getTaskScheduleValue(rightTask);
+
+            return timeFilter === "oldest" ? leftSchedule - rightSchedule : rightSchedule - leftSchedule;
+        });
+    }, [statusFilter, tasks, timeFilter]);
+
+    const formatTaskDateTime = (taskDate, taskTime) => {
+        if (!taskDate || !taskTime) {
+            return "Not scheduled";
+        }
+
+        const date = new Date(`${taskDate}T${taskTime}`);
+
+        if (Number.isNaN(date.getTime())) {
+            return `${taskDate} at ${taskTime}`;
+        }
+
+        return new Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }).format(date);
+    };
+
+    const closeFormModal = () => {
+        setIsFormOpen(false);
+        setFormError("");
+        setEditingTaskId(null);
+        setForm(emptyForm);
+    };
+
+    const openCreateModal = () => {
+        setForm(emptyForm);
+        setEditingTaskId(null);
+        setFormError("");
+        setIsFormOpen(true);
+    };
+
+    const openEditModal = (task) => {
+        setEditingTaskId(task._id);
+        setForm({
+            taskName: task.taskName || "",
+            description: task.description || "",
+            taskDate: task.taskDate || "",
+            taskTime: task.taskTime || ""
+        });
+        setFormError("");
+        setIsFormOpen(true);
+    };
+
+    const openDetails = (task) => {
+        setDetailTask(task);
+        setIsDetailsOpen(true);
+    };
 
     useEffect(() => {
         if (!token) {
@@ -76,7 +154,16 @@ const UserDashboard = () => {
         navigate("/login/user", { replace: true });
     };
 
-    const handleCreateTask = async (event) => {
+    const syncTaskInState = (updatedTask) => {
+        setTasks((currentTasks) =>
+            currentTasks.map((task) => (task._id === updatedTask._id ? updatedTask : task))
+        );
+        setDetailTask((currentTask) =>
+            currentTask && currentTask._id === updatedTask._id ? updatedTask : currentTask
+        );
+    };
+
+    const handleCreateOrUpdateTask = async (event) => {
         event.preventDefault();
 
         if (isSubmitting) {
@@ -87,8 +174,8 @@ const UserDashboard = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch(`${baseUrl}/api/tasks`, {
-                method: "POST",
+            const response = await fetch(`${baseUrl}/api/tasks${isEditing ? `/${editingTaskId}` : ""}`, {
+                method: isEditing ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
@@ -99,34 +186,70 @@ const UserDashboard = () => {
             const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                throw new Error(data.message || "Unable to create task.");
+                throw new Error(data.message || (isEditing ? "Unable to update task." : "Unable to create task."));
             }
 
-            setTasks((currentTasks) => [data.task, ...currentTasks]);
-            setForm(emptyForm);
-            setIsFormOpen(false);
+            if (isEditing) {
+                syncTaskInState(data.task);
+            } else {
+                setTasks((currentTasks) => [data.task, ...currentTasks]);
+            }
+
+            closeFormModal();
         } catch (error) {
-            setFormError(error.message || "Unable to create task.");
+            setFormError(error.message || (isEditing ? "Unable to update task." : "Unable to create task."));
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const formatTaskDateTime = (taskDate, taskTime) => {
-        if (!taskDate || !taskTime) {
-            return "Not scheduled";
+    const handleDeleteTask = async (taskId) => {
+        const confirmed = window.confirm("Delete this task permanently?");
+
+        if (!confirmed) {
+            return;
         }
 
-        const date = new Date(`${taskDate}T${taskTime}`);
+        try {
+            const response = await fetch(`${baseUrl}/api/tasks/${taskId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
-        if (Number.isNaN(date.getTime())) {
-            return `${taskDate} at ${taskTime}`;
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to delete task.");
+            }
+
+            setTasks((currentTasks) => currentTasks.filter((task) => task._id !== taskId));
+            setDetailTask((currentTask) => (currentTask && currentTask._id === taskId ? null : currentTask));
+        } catch (error) {
+            setPageError(error.message || "Unable to delete task.");
         }
+    };
 
-        return new Intl.DateTimeFormat(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short"
-        }).format(date);
+    const handleMarkComplete = async (taskId) => {
+        try {
+            const response = await fetch(`${baseUrl}/api/tasks/${taskId}/status`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to update task status.");
+            }
+
+            syncTaskInState(data.task);
+        } catch (error) {
+            setPageError(error.message || "Unable to update task status.");
+        }
     };
 
     return (
@@ -148,7 +271,7 @@ const UserDashboard = () => {
                                     Welcome back, {user?.name || "User"}
                                 </h1>
                                 <p className="mt-2 max-w-2xl text-sm text-slate-600 md:text-base">
-                                    Track your work, create new tasks, and keep every deadline in one clean workspace.
+                                    Track your work, edit deadlines, complete tasks, and keep everything organized in one place.
                                 </p>
                             </div>
                         </div>
@@ -156,7 +279,7 @@ const UserDashboard = () => {
                         <div className="flex flex-wrap gap-3">
                             <button
                                 type="button"
-                                onClick={() => setIsFormOpen(true)}
+                                onClick={openCreateModal}
                                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-slate-800"
                             >
                                 <span className="text-base leading-none">+</span>
@@ -180,8 +303,11 @@ const UserDashboard = () => {
                         { label: "Pending", value: stats.pending, accent: "from-amber-500 to-orange-400" },
                         { label: "Completed", value: stats.completed, accent: "from-emerald-500 to-teal-400" }
                     ].map((item) => (
-                        <div key={item.label} className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/80 p-5 shadow-lg shadow-slate-900/5 backdrop-blur">
-                              <div className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${item.accent}`} />
+                        <div
+                            key={item.label}
+                            className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/80 p-5 shadow-lg shadow-slate-900/5 backdrop-blur"
+                        >
+                            <div className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${item.accent}`} />
                             <p className="text-sm font-medium text-slate-500">{item.label}</p>
                             <p className="mt-3 text-4xl font-semibold tracking-tight text-slate-900">{item.value}</p>
                         </div>
@@ -194,6 +320,42 @@ const UserDashboard = () => {
                     </div>
                 )}
 
+                <section className="overflow-hidden rounded-3xl border border-white/60 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h2 className="text-lg font-semibold text-slate-900">Filter Tasks</h2>
+                            <p className="text-sm text-slate-500">Filter by status and sort by task timing.</p>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 lg:min-w-105">
+                            <label className="block text-sm font-semibold text-slate-700">
+                                Status
+                                <select
+                                    value={statusFilter}
+                                    onChange={(event) => setStatusFilter(event.target.value)}
+                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                                >
+                                    <option value="all">All Tasks</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </label>
+
+                            <label className="block text-sm font-semibold text-slate-700">
+                                Schedule Order
+                                <select
+                                    value={timeFilter}
+                                    onChange={(event) => setTimeFilter(event.target.value)}
+                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                                >
+                                    <option value="latest">Latest Task</option>
+                                    <option value="oldest">Oldest Task</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
                 <section className="overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-[0_20px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
                     <div className="border-b border-slate-200/80 px-6 py-5">
                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -203,7 +365,7 @@ const UserDashboard = () => {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => setIsFormOpen(true)}
+                                onClick={openCreateModal}
                                 className="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-500"
                             >
                                 New Task
@@ -218,7 +380,7 @@ const UserDashboard = () => {
                                     <div key={item} className="h-44 animate-pulse rounded-3xl bg-slate-100" />
                                 ))}
                             </div>
-                        ) : tasks.length === 0 ? (
+                        ) : visibleTasks.length === 0 ? (
                             <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center">
                                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-100 text-2xl text-sky-700">
                                     ✓
@@ -229,7 +391,7 @@ const UserDashboard = () => {
                                 </p>
                                 <button
                                     type="button"
-                                    onClick={() => setIsFormOpen(true)}
+                                    onClick={openCreateModal}
                                     className="mt-6 inline-flex items-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                                 >
                                     Create Task
@@ -237,13 +399,14 @@ const UserDashboard = () => {
                             </div>
                         ) : (
                             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                {tasks.map((task) => (
-                                    <article key={task._id} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                                {visibleTasks.map((task) => (
+                                    <article
+                                        key={task._id}
+                                        className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                                    >
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
-                                                    Task
-                                                </p>
+                                                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Task</p>
                                                 <h3 className="mt-2 text-lg font-semibold text-slate-900">{task.taskName}</h3>
                                             </div>
                                             <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusStyles[task.status] || statusStyles.pending}`}>
@@ -251,7 +414,15 @@ const UserDashboard = () => {
                                             </span>
                                         </div>
 
-                                        <p className="mt-4 text-sm leading-6 text-slate-600" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                        <p
+                                            className="mt-4 text-sm leading-6 text-slate-600"
+                                            style={{
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: "vertical",
+                                                overflow: "hidden"
+                                            }}
+                                        >
                                             {task.description}
                                         </p>
 
@@ -266,10 +437,49 @@ const UserDashboard = () => {
                                             </div>
                                             <div className="flex items-center justify-between gap-3">
                                                 <span className="font-medium text-slate-500">Scheduled</span>
-                                                <span className="text-right font-semibold text-slate-900">
-                                                    {formatTaskDateTime(task.taskDate, task.taskTime)}
-                                                </span>
+                                                <span className="text-right font-semibold text-slate-900">{formatTaskDateTime(task.taskDate, task.taskTime)}</span>
                                             </div>
+                                        </div>
+
+                                        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => openDetails(task)}
+                                                className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
+                                            >
+                                                View Details
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => openEditModal(task)}
+                                                className="rounded-2xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteTask(task._id)}
+                                                className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+                                            >
+                                                Delete
+                                            </button>
+                                            {task.status !== "completed" ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleMarkComplete(task._id)}
+                                                    className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                                                >
+                                                    Mark Complete
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleMarkComplete(task._id)}
+                                                    className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                                                >
+                                                    Mark Pending
+                                                </button>
+                                            )}
                                         </div>
                                     </article>
                                 ))}
@@ -285,15 +495,14 @@ const UserDashboard = () => {
                         <div className="border-b border-slate-200 px-6 py-5">
                             <div className="flex items-center justify-between gap-4">
                                 <div>
-                                    <h3 className="text-xl font-semibold text-slate-900">Create Task</h3>
-                                    <p className="text-sm text-slate-500">Add a new task with deadline details.</p>
+                                    <h3 className="text-xl font-semibold text-slate-900">{isEditing ? "Edit Task" : "Create Task"}</h3>
+                                    <p className="text-sm text-slate-500">
+                                        {isEditing ? "Update the task details below." : "Add a new task with deadline details."}
+                                    </p>
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setIsFormOpen(false);
-                                        setFormError("");
-                                    }}
+                                    onClick={closeFormModal}
                                     className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
                                 >
                                     Close
@@ -301,7 +510,7 @@ const UserDashboard = () => {
                             </div>
                         </div>
 
-                        <form onSubmit={handleCreateTask} className="space-y-4 px-6 py-6">
+                        <form onSubmit={handleCreateOrUpdateTask} className="space-y-4 px-6 py-6">
                             <label className="block text-sm font-semibold text-slate-700">
                                 Task Name
                                 <input
@@ -351,18 +560,13 @@ const UserDashboard = () => {
                             </div>
 
                             {formError && (
-                                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
-                                    {formError}
-                                </p>
+                                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{formError}</p>
                             )}
 
                             <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setIsFormOpen(false);
-                                        setFormError("");
-                                    }}
+                                    onClick={closeFormModal}
                                     className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
                                 >
                                     Cancel
@@ -372,10 +576,82 @@ const UserDashboard = () => {
                                     disabled={isSubmitting}
                                     className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                                 >
-                                    {isSubmitting ? "Creating..." : "Create Task"}
+                                    {isSubmitting ? (isEditing ? "Updating..." : "Creating...") : isEditing ? "Update Task" : "Create Task"}
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {isDetailsOpen && detailTask && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-8 backdrop-blur-sm">
+                    <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-[0_30px_120px_rgba(15,23,42,0.28)]">
+                        <div className="border-b border-slate-200 px-6 py-5">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Task Details</p>
+                                    <h3 className="mt-2 text-2xl font-semibold text-slate-900">{detailTask.taskName}</h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDetailsOpen(false)}
+                                    className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-5 px-6 py-6">
+                            <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                                <span className="text-sm font-medium text-slate-500">Status</span>
+                                <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusStyles[detailTask.status] || statusStyles.pending}`}>
+                                    {detailTask.status}
+                                </span>
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                                <p className="text-sm font-semibold text-slate-500">Description</p>
+                                <p className="mt-2 text-sm leading-6 text-slate-700">{detailTask.description}</p>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-sm font-semibold text-slate-500">Date</p>
+                                    <p className="mt-2 text-base font-semibold text-slate-900">{detailTask.taskDate}</p>
+                                </div>
+                                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-sm font-semibold text-slate-500">Time</p>
+                                    <p className="mt-2 text-base font-semibold text-slate-900">{detailTask.taskTime}</p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-sm font-semibold text-slate-500">Scheduled</p>
+                                <p className="mt-2 text-base font-semibold text-slate-900">{formatTaskDateTime(detailTask.taskDate, detailTask.taskTime)}</p>
+                            </div>
+
+                            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDetailsOpen(false)}
+                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsDetailsOpen(false);
+                                        openEditModal(detailTask);
+                                    }}
+                                    className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-500"
+                                >
+                                    Edit Task
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
