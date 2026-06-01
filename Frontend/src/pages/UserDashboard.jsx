@@ -260,7 +260,7 @@ const UserDashboard = () => {
             <div className="absolute inset-x-0 top-0 -z-10 h-80 bg-linear-to-b from-sky-100/80 to-transparent" />
 
             <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-6 py-8 lg:px-10">
-                <section className="overflow-hidden rounded-3xl border border-white/60 bg-white/75 p-6 shadow-[0_20px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl lg:p-8">
+                <section className="overflow-hidden rounded-xl border border-white/60 bg-white/75 p-6 shadow-md backdrop-blur-xl lg:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                         <div className="space-y-3">
                             <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-sky-700 ring-1 ring-sky-200">
@@ -280,7 +280,7 @@ const UserDashboard = () => {
                             <button
                                 type="button"
                                 onClick={openCreateModal}
-                                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-slate-800"
+                                className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800"
                             >
                                 <span className="text-base leading-none">+</span>
                                 Create Task
@@ -289,7 +289,7 @@ const UserDashboard = () => {
                             <button
                                 type="button"
                                 onClick={handleLogout}
-                                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
+                                className="cursor-pointer inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
                             >
                                 Logout
                             </button>
@@ -305,7 +305,7 @@ const UserDashboard = () => {
                     ].map((item) => (
                         <div
                             key={item.label}
-                            className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/80 p-5 shadow-lg shadow-slate-900/5 backdrop-blur"
+                            className="relative overflow-hidden rounded-lg border border-white/60 bg-white/80 p-5 shadow-md shadow-slate-900/5 backdrop-blur"
                         >
                             <div className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${item.accent}`} />
                             <p className="text-sm font-medium text-slate-500">{item.label}</p>
@@ -320,7 +320,7 @@ const UserDashboard = () => {
                     </div>
                 )}
 
-                <section className="overflow-hidden rounded-3xl border border-white/60 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur">
+                <section className="overflow-hidden rounded-xl border border-white/60 bg-white/80 p-4 shadow-md shadow-slate-900/5 backdrop-blur">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h2 className="text-lg font-semibold text-slate-900">Filter Tasks</h2>
@@ -333,7 +333,7 @@ const UserDashboard = () => {
                                 <select
                                     value={statusFilter}
                                     onChange={(event) => setStatusFilter(event.target.value)}
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                                    className="cursor-pointer mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                                 >
                                     <option value="all">All Tasks</option>
                                     <option value="pending">Pending</option>
@@ -346,7 +346,7 @@ const UserDashboard = () => {
                                 <select
                                     value={timeFilter}
                                     onChange={(event) => setTimeFilter(event.target.value)}
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                                    className="cursor-pointer mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                                 >
                                     <option value="latest">Latest Task</option>
                                     <option value="oldest">Oldest Task</option>
@@ -356,7 +356,7 @@ const UserDashboard = () => {
                     </div>
                 </section>
 
-                <section className="overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-[0_20px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+                <section className="overflow-hidden rounded-xl border border-white/60 bg-white/80 shadow-md backdrop-blur-xl">
                     <div className="border-b border-slate-200/80 px-6 py-5">
                         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                             <div>
@@ -366,7 +366,7 @@ const UserDashboard = () => {
                             <button
                                 type="button"
                                 onClick={openCreateModal}
-                                className="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-500"
+                                className="cursor-pointer inline-flex items-center justify-center rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-sky-200 transition hover:bg-sky-500"
                             >
                                 New Task
                             </button>
@@ -377,11 +377,11 @@ const UserDashboard = () => {
                         {isLoading ? (
                             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                                 {[1, 2, 3].map((item) => (
-                                    <div key={item} className="h-44 animate-pulse rounded-3xl bg-slate-100" />
+                                    <div key={item} className="h-44 animate-pulse rounded-lg bg-slate-100" />
                                 ))}
                             </div>
                         ) : visibleTasks.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center">
+                            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center">
                                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-100 text-2xl text-sky-700">
                                     ✓
                                 </div>
@@ -392,7 +392,7 @@ const UserDashboard = () => {
                                 <button
                                     type="button"
                                     onClick={openCreateModal}
-                                    className="mt-6 inline-flex items-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                                    className="cursor-pointer mt-6 inline-flex items-center rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                                 >
                                     Create Task
                                 </button>
@@ -402,7 +402,7 @@ const UserDashboard = () => {
                                 {visibleTasks.map((task) => (
                                     <article
                                         key={task._id}
-                                        className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+                                        className="group rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
@@ -441,45 +441,50 @@ const UserDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                                            <button
-                                                type="button"
-                                                onClick={() => openDetails(task)}
-                                                className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-                                            >
-                                                View Details
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => openEditModal(task)}
-                                                className="rounded-2xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDeleteTask(task._id)}
-                                                className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
-                                            >
-                                                Delete
-                                            </button>
-                                            {task.status !== "completed" ? (
+                                        <div className="mt-5 flex justify-between">
+                                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleMarkComplete(task._id)}
-                                                    className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                                                    onClick={() => openDetails(task)}
+                                                    className="cursor-pointer w-max rounded-lg border border-slate-200 bg-white p-2 text-xs font-semibold transition hover:border-slate-300 hover:text-slate-900"
                                                 >
-                                                    Mark Complete
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-slate-700" viewBox="0 -960 960 960"><path d="M607.5-372.5Q660-425 660-500t-52.5-127.5Q555-680 480-680t-127.5 52.5Q300-575 300-500t52.5 127.5Q405-320 480-320t127.5-52.5Zm-204-51Q372-455 372-500t31.5-76.5Q435-608 480-608t76.5 31.5Q588-545 588-500t-31.5 76.5Q525-392 480-392t-76.5-31.5ZM214-281.5Q94-363 40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200q-146 0-266-81.5ZM480-500Zm207.5 160.5Q782-399 832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280q113 0 207.5-59.5Z" /></svg>
                                                 </button>
-                                            ) : (
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleMarkComplete(task._id)}
-                                                    className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                                                    onClick={() => openEditModal(task)}
+                                                    className="cursor-pointer w-max rounded-lg border border-sky-200 bg-sky-50 p-2 text-xs font-semibold transition hover:bg-sky-100"
                                                 >
-                                                    Mark Pending
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-sky-700" viewBox="0 0 640 640"><path d="M535.6 85.7C513.7 63.8 478.3 63.8 456.4 85.7L432 110.1L529.9 208L554.3 183.6C576.2 161.7 576.2 126.3 554.3 104.4L535.6 85.7zM236.4 305.7C230.3 311.8 225.6 319.3 222.9 327.6L193.3 416.4C190.4 425 192.7 434.5 199.1 441C205.5 447.5 215 449.7 223.7 446.8L312.5 417.2C320.7 414.5 328.2 409.8 334.4 403.7L496 241.9L398.1 144L236.4 305.7zM160 128C107 128 64 171 64 224L64 480C64 533 107 576 160 576L416 576C469 576 512 533 512 480L512 384C512 366.3 497.7 352 480 352C462.3 352 448 366.3 448 384L448 480C448 497.7 433.7 512 416 512L160 512C142.3 512 128 497.7 128 480L128 224C128 206.3 142.3 192 160 192L256 192C273.7 192 288 177.7 288 160C288 142.3 273.7 128 256 128L160 128z" /></svg>
                                                 </button>
-                                            )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteTask(task._id)}
+                                                    className="cursor-pointer w-max rounded-lg border border-rose-200 bg-rose-50 p-2 text-xs font-semibold transition hover:bg-rose-100"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 fill-rose-700" viewBox="0 -960 960 960"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" /></svg>
+                                                </button>
+                                            </div>
+
+                                            <div>
+                                                {task.status !== "completed" ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMarkComplete(task._id)}
+                                                        className="cursor-pointer w-max rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                                                    >
+                                                        Mark Complete
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMarkComplete(task._id)}
+                                                        className="cursor-pointer rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                                                    >
+                                                        Mark Pending
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </article>
                                 ))}
@@ -490,8 +495,8 @@ const UserDashboard = () => {
             </main>
 
             {isFormOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-8 backdrop-blur-sm">
-                    <div className="w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-[0_30px_120px_rgba(15,23,42,0.28)]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-8">
+                    <div className="w-full max-w-xl overflow-hidden rounded-xl bg-white shadow-[0_30px_120px_rgba(15,23,42,0.28)]">
                         <div className="border-b border-slate-200 px-6 py-5">
                             <div className="flex items-center justify-between gap-4">
                                 <div>
@@ -503,7 +508,7 @@ const UserDashboard = () => {
                                 <button
                                     type="button"
                                     onClick={closeFormModal}
-                                    className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
+                                    className="cursor-pointer rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
                                 >
                                     Close
                                 </button>
@@ -519,7 +524,7 @@ const UserDashboard = () => {
                                     onChange={(event) => setForm((current) => ({ ...current, taskName: event.target.value }))}
                                     placeholder="Enter task name"
                                     required
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                                    className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
                                 />
                             </label>
 
@@ -531,7 +536,7 @@ const UserDashboard = () => {
                                     placeholder="Describe the task"
                                     rows="4"
                                     required
-                                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                                    className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
                                 />
                             </label>
 
@@ -543,7 +548,7 @@ const UserDashboard = () => {
                                         value={form.taskDate}
                                         onChange={(event) => setForm((current) => ({ ...current, taskDate: event.target.value }))}
                                         required
-                                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                                        className="cursor-pointer mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
                                     />
                                 </label>
 
@@ -554,27 +559,27 @@ const UserDashboard = () => {
                                         value={form.taskTime}
                                         onChange={(event) => setForm((current) => ({ ...current, taskTime: event.target.value }))}
                                         required
-                                        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                                        className="cursor-pointer mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
                                     />
                                 </label>
                             </div>
 
                             {formError && (
-                                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{formError}</p>
+                                <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">{formError}</p>
                             )}
 
                             <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
                                 <button
                                     type="button"
                                     onClick={closeFormModal}
-                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
+                                    className="cursor-pointer rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                                    className="cursor-pointer rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                                 >
                                     {isSubmitting ? (isEditing ? "Updating..." : "Creating...") : isEditing ? "Update Task" : "Create Task"}
                                 </button>
@@ -585,8 +590,8 @@ const UserDashboard = () => {
             )}
 
             {isDetailsOpen && detailTask && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-8 backdrop-blur-sm">
-                    <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-[0_30px_120px_rgba(15,23,42,0.28)]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-8">
+                    <div className="w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-[0_30px_120px_rgba(15,23,42,0.28)]">
                         <div className="border-b border-slate-200 px-6 py-5">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
@@ -596,14 +601,14 @@ const UserDashboard = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsDetailsOpen(false)}
-                                    className="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
+                                    className="cursor-pointer rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200"
                                 >
                                     Close
                                 </button>
                             </div>
                         </div>
 
-                        <div className="space-y-5 px-6 py-6">
+                        <div className="space-y-5 px-6 py-2">
                             <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3">
                                 <span className="text-sm font-medium text-slate-500">Status</span>
                                 <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusStyles[detailTask.status] || statusStyles.pending}`}>
@@ -611,23 +616,23 @@ const UserDashboard = () => {
                                 </span>
                             </div>
 
-                            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                            <div className="rounded-lg border border-slate-200 bg-white p-4">
                                 <p className="text-sm font-semibold text-slate-500">Description</p>
                                 <p className="mt-2 text-sm leading-6 text-slate-700">{detailTask.description}</p>
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                                     <p className="text-sm font-semibold text-slate-500">Date</p>
                                     <p className="mt-2 text-base font-semibold text-slate-900">{detailTask.taskDate}</p>
                                 </div>
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                                     <p className="text-sm font-semibold text-slate-500">Time</p>
                                     <p className="mt-2 text-base font-semibold text-slate-900">{detailTask.taskTime}</p>
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                                 <p className="text-sm font-semibold text-slate-500">Scheduled</p>
                                 <p className="mt-2 text-base font-semibold text-slate-900">{formatTaskDateTime(detailTask.taskDate, detailTask.taskTime)}</p>
                             </div>
@@ -636,7 +641,7 @@ const UserDashboard = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsDetailsOpen(false)}
-                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
+                                    className="cursor-pointer rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300"
                                 >
                                     Close
                                 </button>
@@ -646,7 +651,7 @@ const UserDashboard = () => {
                                         setIsDetailsOpen(false);
                                         openEditModal(detailTask);
                                     }}
-                                    className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-500"
+                                    className="cursor-pointer rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-sky-200 transition hover:bg-sky-500"
                                 >
                                     Edit Task
                                 </button>
